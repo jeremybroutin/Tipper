@@ -17,13 +17,17 @@ class TipViewController: UIViewController {
   @IBOutlet weak var topConstraint: NSLayoutConstraint!
   @IBOutlet weak var amountTextField: UITextField!
   @IBOutlet weak var tipSegmentedControl: UISegmentedControl!
+  @IBOutlet weak var tipStaticLabel: UILabel!
   @IBOutlet weak var tipResultLabel: UILabel!
+  @IBOutlet weak var totalStaticLabel: UILabel!
   @IBOutlet weak var totalResultLabel: UILabel!
 
   let darkThemeSecondColor = UIColor(red:0.82, green:0.92, blue:0.86, alpha:1.0)
   let darkThemeMainColor = UIColor(red:0.55, green:0.93, blue:0.72, alpha:1.0)
-  let defaultAmountPlaceHolderText = "Enter amount..."
+  let defaultAmountPlaceHolderText = "Enter bill amount..."
   let tipOptions = [0.15, 0.18, 0.25]
+  var selectedTip: Double!
+  let maxAmountCharactersLength = 7
 
   let settingsSegueIdentifier = "GoToSettings"
 
@@ -43,6 +47,14 @@ class TipViewController: UIViewController {
   // MARK: - UI Setup helper methods
 
   func customizeUIElements(with theme: ColorTheme) {
+    // Default
+    let settingsBarButtonItem = createBarButtonItem(WithText: "Settings")
+    navigationItem.rightBarButtonItems = [settingsBarButtonItem]
+    setTipOptions(forSegmentedControl: tipSegmentedControl)
+    shouldDisplayTipResultLabels(false)
+    addDoneButtonOnKeyboard()
+
+    // Theme specifics.
     if theme == .Dark {
       amountTextField.delegate = self
       amountTextField.textColor = darkThemeMainColor
@@ -50,9 +62,6 @@ class TipViewController: UIViewController {
         NSForegroundColorAttributeName: darkThemeSecondColor,
         NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: 45)!
         ])
-      let settingsBarButtonItem = createBarButtonItem(WithText: "Settings")
-      navigationItem.rightBarButtonItems = [settingsBarButtonItem]
-      setTipOptions(forSegmentedControl: tipSegmentedControl)
     }
   }
 
@@ -75,6 +84,7 @@ class TipViewController: UIViewController {
       control.setTitle("\(tipOptions[i]*100)%", forSegmentAt: i)
     }
     control.selectedSegmentIndex = 0
+    selectedTip = tipOptions[control.selectedSegmentIndex]
   }
 
   func goToSettings() {
@@ -87,6 +97,59 @@ class TipViewController: UIViewController {
     }, completion: nil)
   }
 
+  func shouldDisplayTipResultLabels(_ value:Bool) {
+    tipStaticLabel.isHidden = !value
+    tipResultLabel.isHidden = !value
+    totalStaticLabel.isHidden = !value
+    totalResultLabel.isHidden = !value
+  }
+
+  func addDoneButtonOnKeyboard() {
+    let doneToolBar: UIToolbar = UIToolbar(frame: CGRect(x: 0, y: 0, width: 320, height: 50))
+    doneToolBar.barStyle = UIBarStyle.blackTranslucent
+    let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+    let done = UIBarButtonItem(title: "Done", style: .done, target: self, action: #selector(TipViewController.doneButtonAction))
+    var items = [UIBarButtonItem]()
+    items.append(flexSpace)
+    items.append(done)
+    doneToolBar.items = items
+    doneToolBar.sizeToFit()
+    self.amountTextField.inputAccessoryView = doneToolBar
+  }
+
+  func doneButtonAction() {
+    self.amountTextField.resignFirstResponder()
+  }
+
+  // MARK: - Tip calculation.
+
+  func calculateTipAndTotal(fromAmount amount: String, completion: ((Bool) -> Void)?) {
+    guard let amount = Double(amount), let tipPercent = selectedTip else {
+      completion?(false)
+      return
+    }
+    let tip = amount * tipPercent
+    let total = amount + tip
+    tipResultLabel.text = "$\(String(tip))"
+    totalResultLabel.text = "$\(String(total))"
+    completion?(true)
+  }
+
+  // MARK: - IBActions
+
+  @IBAction func tappedTipOptions(_ sender: UISegmentedControl) {
+    selectedTip = tipOptions[sender.selectedSegmentIndex]
+    calculateTipAndTotal(fromAmount: amountTextField.text!, completion: nil)
+  }
+
+  @IBAction func textFieldEditingDidChange(_ sender: UITextField) {
+    if sender.text!.isEmpty {
+      tipResultLabel.text = "$0.00"
+      totalResultLabel.text = "$0.00"
+    } else {
+      calculateTipAndTotal(fromAmount: sender.text!, completion:  nil)
+    }
+  }
 
   // MARK: - Keyboard display listeners
 
@@ -118,27 +181,28 @@ extension TipViewController: UITextFieldDelegate {
     return true
   }
 
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-
-    if string == "." {
-      return true // do nothing.
-    }
-
-    var amount: Double = 0.0
-    if let existingText = textField.text, let stringValue = Double(string) {
-      if existingText.isEmpty {
-        amount = stringValue
-      } else {
-        let amountText: String = existingText + string
-        guard let amountValue = Double(amountText) else { return true }
-        amount = amountValue
-      }
-    }
-    let tip: Double = amount * 0.15
-    tipResultLabel.text = "$\(String(tip))"
-    totalResultLabel.text = "$\(amount + tip)"
-    return true
+  func textFieldDidBeginEditing(_ textField: UITextField) {
+    shouldDisplayTipResultLabels(true)
   }
 
+  func textFieldDidEndEditing(_ textField: UITextField) {
+    if textField.text!.isEmpty {
+      shouldDisplayTipResultLabels(false)
+    }
+  }
+
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    guard let text = textField.text else { return true }
+    // Do not allow multiple dots.
+    if string == "." {
+      for c in text.characters {
+        if c == "." { return false }
+      }
+      return true
+    }
+    // Limit max characters
+    let length = text.characters.count + string.utf16.count - range.length
+    return length <= maxAmountCharactersLength
+  }
 }
 
