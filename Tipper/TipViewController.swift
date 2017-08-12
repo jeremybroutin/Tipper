@@ -23,6 +23,7 @@ class TipViewController: UIViewController {
   let darkThemeSecondColor = UIColor(red:0.82, green:0.92, blue:0.86, alpha:1.0)
   let darkThemeMainColor = UIColor(red:0.55, green:0.93, blue:0.72, alpha:1.0)
   let defaultAmountPlaceHolderText = "Enter amount..."
+  let tipOptions = [0.15, 0.18, 0.25]
 
   let settingsSegueIdentifier = "GoToSettings"
 
@@ -51,20 +52,29 @@ class TipViewController: UIViewController {
         ])
       let settingsBarButtonItem = createBarButtonItem(WithText: "Settings")
       navigationItem.rightBarButtonItems = [settingsBarButtonItem]
+      setTipOptions(forSegmentedControl: tipSegmentedControl)
     }
   }
 
   func createBarButtonItem(WithText text: String) -> UIBarButtonItem {
     let button = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
-    // Framing
     button.setTitle(text, for: .normal)
     button.sizeToFit()
-    // Customizing
     button.setTitleColor(darkThemeMainColor, for: .normal)
     button.addTarget(self, action: #selector(TipViewController.goToSettings), for: .touchUpInside)
-    // Converting
     let barButtonItem = UIBarButtonItem(customView: button)
     return barButtonItem
+  }
+
+  func setTipOptions(forSegmentedControl control: UISegmentedControl) {
+    if control.numberOfSegments != 3 {
+      print("Incorrect number of segments for tip options.")
+      return
+    }
+    for i in 0...2 {
+      control.setTitle("\(tipOptions[i]*100)%", forSegmentAt: i)
+    }
+    control.selectedSegmentIndex = 0
   }
 
   func goToSettings() {
