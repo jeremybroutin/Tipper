@@ -28,6 +28,7 @@ class TipViewController: UIViewController {
   let tipOptions = [0.15, 0.18, 0.25]
   var selectedTip: Double!
   let maxAmountCharactersLength = 7
+  let defaultCurrencyCharacter = "$"
 
   let settingsSegueIdentifier = "GoToSettings"
 
@@ -35,10 +36,10 @@ class TipViewController: UIViewController {
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    // View title.
+    navigationItem.title = "Tipper"
     // Setup UI.
     customizeUIElements(with:.Dark)
-
     // Subscribe to keyboard display notifications.
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
@@ -57,7 +58,7 @@ class TipViewController: UIViewController {
     // Theme specifics.
     if theme == .Dark {
       amountTextField.delegate = self
-      amountTextField.textColor = darkThemeMainColor
+      amountTextField.textColor = darkThemeSecondColor
       amountTextField.attributedPlaceholder = NSAttributedString(string: defaultAmountPlaceHolderText, attributes: [
         NSForegroundColorAttributeName: darkThemeSecondColor,
         NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: 45)!
@@ -68,8 +69,9 @@ class TipViewController: UIViewController {
   func createBarButtonItem(WithText text: String) -> UIBarButtonItem {
     let button = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
     button.setTitle(text, for: .normal)
+    button.titleLabel?.font = UIFont.systemFont(ofSize: 15.0)
     button.sizeToFit()
-    button.setTitleColor(darkThemeMainColor, for: .normal)
+    button.setTitleColor(UIColor.black, for: .normal)
     button.addTarget(self, action: #selector(TipViewController.goToSettings), for: .touchUpInside)
     let barButtonItem = UIBarButtonItem(customView: button)
     return barButtonItem
@@ -85,10 +87,6 @@ class TipViewController: UIViewController {
     }
     control.selectedSegmentIndex = 0
     selectedTip = tipOptions[control.selectedSegmentIndex]
-  }
-
-  func goToSettings() {
-    performSegue(withIdentifier: settingsSegueIdentifier, sender: self)
   }
 
   func animateLayoutChanges() {
@@ -130,8 +128,8 @@ class TipViewController: UIViewController {
     }
     let tip = amount * tipPercent
     let total = amount + tip
-    tipResultLabel.text = "$\(String(tip))"
-    totalResultLabel.text = "$\(String(total))"
+    tipResultLabel.text = "\(defaultCurrencyCharacter)\(String(tip))"
+    totalResultLabel.text = "\(defaultCurrencyCharacter)\(String(total))"
     completion?(true)
   }
 
@@ -144,11 +142,16 @@ class TipViewController: UIViewController {
 
   @IBAction func textFieldEditingDidChange(_ sender: UITextField) {
     if sender.text!.isEmpty {
-      tipResultLabel.text = "$0.00"
-      totalResultLabel.text = "$0.00"
+      tipResultLabel.text = "\(defaultCurrencyCharacter)0.00"
+      totalResultLabel.text = "\(defaultCurrencyCharacter)0.00"
     } else {
       calculateTipAndTotal(fromAmount: sender.text!, completion:  nil)
     }
+  }
+
+  func goToSettings() {
+    view.endEditing(true)
+    performSegue(withIdentifier: settingsSegueIdentifier, sender: self)
   }
 
   // MARK: - Keyboard display listeners
