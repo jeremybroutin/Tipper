@@ -125,8 +125,8 @@ extension TipViewController: UITextFieldDelegate {
       }
     }
     let tip: Double = amount * 0.15
-    tipResultLabel.text = "Tip:          $\(String(tip))" // Bouh ugly, lazy!
-    totalResultLabel.text = "Total          $\(amount + tip)" // TODO: add UILabel for tip and total
+    tipResultLabel.text = "$\(String(tip))"
+    totalResultLabel.text = "$\(amount + tip)"
     return true
   }
 
