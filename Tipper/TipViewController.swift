@@ -26,6 +26,8 @@ class TipViewController: UIViewController {
 
   let settingsSegueIdentifier = "GoToSettings"
 
+  // MARK: - View life cycle
+
   override func viewDidLoad() {
     super.viewDidLoad()
 
@@ -37,40 +39,36 @@ class TipViewController: UIViewController {
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
   }
 
-  func createButton(WithText text: String) -> UIButton {
-    let button = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
-    // Framing
-    button.setTitle("SETTINGS", for: .normal)
-    button.titleLabel?.font = UIFont(name: "HelveticaNeue-Medium", size: 10)
-    button.contentEdgeInsets = UIEdgeInsets(top: 8, left: 14, bottom: 8, right: 14)
-    button.sizeToFit()
-    // Customizing
-    button.setTitleColor(UIColor.white, for: .normal)
-    button.backgroundColor = darkThemeMainColor
-    button.layer.cornerRadius = 5.0
-    button.layer.shadowColor = darkThemeSecondColor.cgColor
-    button.layer.shadowOffset = CGSize(width: 0, height: 2)
-    button.layer.shadowRadius = 0.0
-    button.layer.shadowOpacity = 0.6
-    // Target
-    button.addTarget(self, action: #selector(TipViewController.goToSettings), for: .touchUpInside)
-
-    return button
-  }
-
-  func goToSettings() {
-    performSegue(withIdentifier: settingsSegueIdentifier, sender: self)
-  }
+  // MARK: - UI Setup helper methods
 
   func customizeUIElements(with theme: ColorTheme) {
     if theme == .Dark {
       amountTextField.delegate = self
       amountTextField.textColor = darkThemeMainColor
-      amountTextField.attributedPlaceholder = NSAttributedString(string: defaultAmountPlaceHolderText, attributes: [NSForegroundColorAttributeName: darkThemeSecondColor])
-//      let settingsButton = createButton(WithText: "Settings")
-//      let settingsBarButtonItem = UIBarButtonItem(customView: settingsButton)
-//      navigationItem.rightBarButtonItems = [settingsBarButtonItem]
+      amountTextField.attributedPlaceholder = NSAttributedString(string: defaultAmountPlaceHolderText, attributes: [
+        NSForegroundColorAttributeName: darkThemeSecondColor,
+        NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: 45)!
+        ])
+      let settingsBarButtonItem = createBarButtonItem(WithText: "Settings")
+      navigationItem.rightBarButtonItems = [settingsBarButtonItem]
     }
+  }
+
+  func createBarButtonItem(WithText text: String) -> UIBarButtonItem {
+    let button = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
+    // Framing
+    button.setTitle(text, for: .normal)
+    button.sizeToFit()
+    // Customizing
+    button.setTitleColor(darkThemeMainColor, for: .normal)
+    button.addTarget(self, action: #selector(TipViewController.goToSettings), for: .touchUpInside)
+    // Converting
+    let barButtonItem = UIBarButtonItem(customView: button)
+    return barButtonItem
+  }
+
+  func goToSettings() {
+    performSegue(withIdentifier: settingsSegueIdentifier, sender: self)
   }
 
   func animateLayoutChanges() {
@@ -93,17 +91,15 @@ class TipViewController: UIViewController {
   }
 
   func keyboardWillHide(notification: NSNotification) {
-    if let keyboardSize = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue {
-      if view.frame.origin.y != 0 {
-        view.frame.origin.y = 0
-        topConstraint.constant = 30
-        animateLayoutChanges()
-      }
+    if view.frame.origin.y != 0 {
+      view.frame.origin.y = 0
+      topConstraint.constant = 30
+      animateLayoutChanges()
     }
   }
-
-
 }
+
+// MARK: - Textfield delegate methods
 
 extension TipViewController: UITextFieldDelegate {
 
@@ -129,8 +125,8 @@ extension TipViewController: UITextFieldDelegate {
       }
     }
     let tip: Double = amount * 0.15
-    tipResultLabel.text = "$ \(String(tip))"
-    totalResultLabel.text = "$\(amount + tip)"
+    tipResultLabel.text = "Tip:          $\(String(tip))" // Bouh ugly, lazy!
+    totalResultLabel.text = "Total          $\(amount + tip)" // TODO: add UILabel for tip and total
     return true
   }
 
