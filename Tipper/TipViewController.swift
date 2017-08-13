@@ -12,6 +12,11 @@ enum ColorTheme {
   case Light, Dark
 }
 
+extension UIColor {
+  static let darkThemeSecondColor = UIColor(red:0.82, green:0.92, blue:0.86, alpha:1.0)
+  static let darkThemeMainColor = UIColor(red:0.55, green:0.93, blue:0.72, alpha:1.0)
+}
+
 class TipViewController: UIViewController {
 
   @IBOutlet weak var topConstraint: NSLayoutConstraint!
@@ -22,8 +27,6 @@ class TipViewController: UIViewController {
   @IBOutlet weak var totalStaticLabel: UILabel!
   @IBOutlet weak var totalResultLabel: UILabel!
 
-  let darkThemeSecondColor = UIColor(red:0.82, green:0.92, blue:0.86, alpha:1.0)
-  let darkThemeMainColor = UIColor(red:0.55, green:0.93, blue:0.72, alpha:1.0)
   let defaultAmountPlaceHolderText = "Enter bill amount..."
   let tipOptions = [0.15, 0.18, 0.25]
   var selectedTip: Double!
@@ -58,9 +61,9 @@ class TipViewController: UIViewController {
     // Theme specifics.
     if theme == .Dark {
       amountTextField.delegate = self
-      amountTextField.textColor = darkThemeSecondColor
+      amountTextField.textColor = UIColor.darkThemeSecondColor
       amountTextField.attributedPlaceholder = NSAttributedString(string: defaultAmountPlaceHolderText, attributes: [
-        NSForegroundColorAttributeName: darkThemeSecondColor,
+        NSForegroundColorAttributeName: UIColor.darkThemeSecondColor,
         NSFontAttributeName: UIFont(name: "HelveticaNeue-Thin", size: 45)!
         ])
     }

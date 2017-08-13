@@ -106,10 +106,10 @@
             </objects>
             <point key="canvasLocation" x="837.60000000000002" y="-545.57721139430294"/>
         </scene>
-        <!--View Controller-->
+        <!--Settings View Controller-->
         <scene sceneID="kCS-0V-Rhy">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="3dW-h5-fag" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="3dW-h5-fag" customClass="SettingsViewController" customModule="Tipper" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="3tN-nR-efR"/>
                         <viewControllerLayoutGuide type="bottom" id="sKc-EP-pZV"/>
@@ -118,11 +118,11 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Ieg-cz-jNi">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Ieg-cz-jNi">
                                 <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="gFs-zM-5SB">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="optionCell" id="gFs-zM-5SB">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="gFs-zM-5SB" id="DUm-eO-IqG">
@@ -141,6 +141,9 @@
                             <constraint firstItem="Ieg-cz-jNi" firstAttribute="top" secondItem="3tN-nR-efR" secondAttribute="bottom" id="yE7-28-7Hs"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="tableView" destination="Ieg-cz-jNi" id="TCO-od-Md7"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="I2K-J6-28M" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
