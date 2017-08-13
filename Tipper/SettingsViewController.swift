@@ -13,10 +13,14 @@ class SettingsViewController: UIViewController {
 
   @IBOutlet weak var tableView: UITableView!
 
-  let tipsOption = ["15%", "18%", "20%"]
+  var delegate: Updatable!
+
+  let tipOptions: [TipOptions] = [.Low, .Middle, .High]
   let themeOptions: [ColorTheme] = [.Dark, .Light]
   var lastSelectedTipIndexPath: IndexPath!
   var lastSelectedThemeIndexPath: IndexPath!
+  var defaultTipOption: TipOptions!
+  let manager = UserDefaultsManager.shared
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -25,8 +29,12 @@ class SettingsViewController: UIViewController {
     tableView.dataSource = self
     tableView.delegate = self
     tableView.backgroundColor = UIColor.black
+    getDefaultTip()
   }
 
+  func getDefaultTip() {
+    defaultTipOption = UserDefaultsManager.shared.loadDefaultTip()
+  }
 }
 
 extension SettingsViewController: UITableViewDataSource {
@@ -36,7 +44,7 @@ extension SettingsViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     if section == 0 {
-      return tipsOption.count
+      return tipOptions.count
     } else if section == 1 {
       return themeOptions.count
     } else {
@@ -50,9 +58,17 @@ extension SettingsViewController: UITableViewDataSource {
     cell.textLabel?.textColor = UIColor.darkThemeSecondColor
     cell.tintColor = UIColor.darkThemeMainColor
     cell.selectionStyle = .none
+    // Tip options cells.
     if indexPath.section == 0 {
-      cell.textLabel?.text = tipsOption[indexPath.row]
-    } else if indexPath.section == 1 {
+      let rawTip = tipOptions[indexPath.row].rawValue
+      cell.textLabel?.text = "\(rawTip*100)%"
+      if rawTip == defaultTipOption?.rawValue {
+        cell.accessoryType = .checkmark
+        lastSelectedTipIndexPath = indexPath
+      }
+    }
+    // Color theme options cells.
+    else if indexPath.section == 1 {
       let themeOption = themeOptions[indexPath.row]
       switch themeOption {
       case .Dark:
@@ -88,8 +104,23 @@ extension SettingsViewController: UITableViewDelegate {
         let lastCell = tableView.cellForRow(at: lastSelectedTipIndexPath)
         lastCell?.accessoryType = .none
       }
-      tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+      guard let currentCell = tableView.cellForRow(at: indexPath) else { return }
+      currentCell.accessoryType = .checkmark
       lastSelectedTipIndexPath = indexPath
+
+      // Save as default tip.
+      if let cellText = currentCell.textLabel?.text {
+        let truncatedText = cellText.substring(to: cellText.index(before: cellText.endIndex))
+        guard
+          let doubleValue = Double(truncatedText),
+          let tipOption = manager.matchDoubleToTipOption(doubleValue/100)
+        else {
+          return
+        }
+        manager.saveDefaultTip(tipOption)
+        delegate.updateDefaultTip(withOption: tipOption)
+      }
+
     } else if indexPath.section == 1 {
       if lastSelectedThemeIndexPath != nil {
         let lastCell = tableView.cellForRow(at: lastSelectedThemeIndexPath)
@@ -98,10 +129,6 @@ extension SettingsViewController: UITableViewDelegate {
       tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
       lastSelectedThemeIndexPath = indexPath
     }
-
   }
 
-//  func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-//    tableView.cellForRow(at: indexPath)?.accessoryType = .none
-//  }
 }

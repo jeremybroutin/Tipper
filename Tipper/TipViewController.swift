@@ -12,6 +12,12 @@ enum ColorTheme {
   case Light, Dark
 }
 
+enum TipOptions: Double {
+  case Low = 0.15
+  case Middle = 0.18
+  case High = 0.20
+}
+
 extension UIColor {
   static let darkThemeSecondColor = UIColor(red:0.82, green:0.92, blue:0.86, alpha:1.0)
   static let darkThemeMainColor = UIColor(red:0.55, green:0.93, blue:0.72, alpha:1.0)
@@ -28,12 +34,14 @@ class TipViewController: UIViewController {
   @IBOutlet weak var totalResultLabel: UILabel!
 
   let defaultAmountPlaceHolderText = "Enter bill amount..."
-  let tipOptions = [0.15, 0.18, 0.25]
+  let tipOptions: [Double] = [TipOptions.Low.rawValue, TipOptions.Middle.rawValue, TipOptions.High.rawValue]
   var selectedTip: Double!
   let maxAmountCharactersLength = 7
   let defaultCurrencyCharacter = "$"
-
+  var defaultTipOption: TipOptions!
+  let manager = UserDefaultsManager.shared
   let settingsSegueIdentifier = "GoToSettings"
+
 
   // MARK: - View life cycle
 
@@ -43,6 +51,8 @@ class TipViewController: UIViewController {
     navigationItem.title = "Tipper"
     // Setup UI.
     customizeUIElements(with:.Dark)
+    // Defaults.
+    defaultTipOption = manager.loadDefaultTip()
     // Subscribe to keyboard display notifications.
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
@@ -88,7 +98,8 @@ class TipViewController: UIViewController {
     for i in 0...2 {
       control.setTitle("\(tipOptions[i]*100)%", forSegmentAt: i)
     }
-    control.selectedSegmentIndex = 0
+    defaultTipOption = manager.loadDefaultTip()
+    control.selectedSegmentIndex = manager.matchTipOptionToIndex(defaultTipOption)
     selectedTip = tipOptions[control.selectedSegmentIndex]
   }
 
@@ -157,6 +168,11 @@ class TipViewController: UIViewController {
     performSegue(withIdentifier: settingsSegueIdentifier, sender: self)
   }
 
+  override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+    let vc = segue.destination as! SettingsViewController
+    vc.delegate = self
+  }
+
   // MARK: - Keyboard display listeners
 
   func keyboardWillShow(notification: NSNotification) {
@@ -210,5 +226,20 @@ extension TipViewController: UITextFieldDelegate {
     let length = text.characters.count + string.utf16.count - range.length
     return length <= maxAmountCharactersLength
   }
+}
+
+// MARK: - Protocol for custom delegation.
+
+protocol Updatable {
+  func updateDefaultTip(withOption option: TipOptions)
+}
+
+extension TipViewController: Updatable {
+
+  func updateDefaultTip(withOption option: TipOptions) {
+    tipSegmentedControl.selectedSegmentIndex = manager.matchTipOptionToIndex(option)
+    defaultTipOption = option
+  }
+
 }
 

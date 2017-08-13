@@ -13,6 +13,7 @@
 		E3A231A71F3E5A5A00FE73E2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3A231A61F3E5A5A00FE73E2 /* Assets.xcassets */; };
 		E3A231AA1F3E5A5A00FE73E2 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E3A231A81F3E5A5A00FE73E2 /* LaunchScreen.storyboard */; };
 		E3A231B21F3FD3B000FE73E2 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A231B11F3FD3B000FE73E2 /* SettingsViewController.swift */; };
+		E3A231B41F40342900FE73E2 /* UserDefaultsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3A231B31F40342900FE73E2 /* UserDefaultsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		E3A231A91F3E5A5A00FE73E2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		E3A231AB1F3E5A5A00FE73E2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E3A231B11F3FD3B000FE73E2 /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		E3A231B31F40342900FE73E2 /* UserDefaultsManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,6 +62,7 @@
 				E3A231A11F3E5A5A00FE73E2 /* TipViewController.swift */,
 				E3A231B11F3FD3B000FE73E2 /* SettingsViewController.swift */,
 				E3A231A31F3E5A5A00FE73E2 /* Main.storyboard */,
+				E3A231B31F40342900FE73E2 /* UserDefaultsManager.swift */,
 				E3A231A61F3E5A5A00FE73E2 /* Assets.xcassets */,
 				E3A231A81F3E5A5A00FE73E2 /* LaunchScreen.storyboard */,
 				E3A231AB1F3E5A5A00FE73E2 /* Info.plist */,
@@ -142,6 +145,7 @@
 			files = (
 				E3A231A21F3E5A5A00FE73E2 /* TipViewController.swift in Sources */,
 				E3A231A01F3E5A5A00FE73E2 /* AppDelegate.swift in Sources */,
+				E3A231B41F40342900FE73E2 /* UserDefaultsManager.swift in Sources */,
 				E3A231B21F3FD3B000FE73E2 /* SettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
