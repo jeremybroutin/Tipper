@@ -98,8 +98,13 @@ class TipViewController: UIViewController {
     for i in 0...2 {
       control.setTitle("\(tipOptions[i]*100)%", forSegmentAt: i)
     }
-    defaultTipOption = manager.loadDefaultTip()
-    control.selectedSegmentIndex = manager.matchTipOptionToIndex(defaultTipOption)
+
+    if let tip = manager.loadDefaultTip() {
+      defaultTipOption = manager.loadDefaultTip()
+      control.selectedSegmentIndex = manager.matchTipOptionToIndex(defaultTipOption)
+    } else {
+      control.selectedSegmentIndex = 0
+    }
     selectedTip = tipOptions[control.selectedSegmentIndex]
   }
 
