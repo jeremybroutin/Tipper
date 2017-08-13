@@ -15,6 +15,7 @@ class UserDefaultsManager: NSObject {
 
   private let userDefaults = UserDefaults.standard
   private let defaultTipKey = "tipperDefaultTip"
+  private let timeInBackgroundKey = "timeInBackground"
 
   func saveDefaultTip(_ value: TipOptions) {
     userDefaults.set(value.rawValue, forKey: defaultTipKey)
@@ -39,6 +40,17 @@ class UserDefaultsManager: NSObject {
     case .Middle: return 1
     case .High: return 2
     }
+  }
+
+  func saveBackgroundDate(date: Date) {
+    userDefaults.set(date, forKey: timeInBackgroundKey)
+  }
+
+  func getBackgroundDate() -> Date? {
+    if let date = userDefaults.object(forKey: timeInBackgroundKey) as? Date {
+      return date
+    }
+    return nil
   }
 
 }

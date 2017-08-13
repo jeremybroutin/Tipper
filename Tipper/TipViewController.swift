@@ -79,6 +79,12 @@ class TipViewController: UIViewController {
     }
   }
 
+  func resetAll() {
+    amountTextField.text = ""
+    textFieldEditingDidChange(amountTextField)
+    shouldDisplayTipResultLabels(false)
+  }
+
   func createBarButtonItem(WithText text: String) -> UIBarButtonItem {
     let button = UIButton(frame: CGRect(x: 0, y: 0, width: 0, height: 0))
     button.setTitle(text, for: .normal)
@@ -99,7 +105,7 @@ class TipViewController: UIViewController {
       control.setTitle("\(tipOptions[i]*100)%", forSegmentAt: i)
     }
 
-    if let tip = manager.loadDefaultTip() {
+    if manager.loadDefaultTip() != nil {
       defaultTipOption = manager.loadDefaultTip()
       control.selectedSegmentIndex = manager.matchTipOptionToIndex(defaultTipOption)
     } else {

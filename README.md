@@ -15,9 +15,9 @@ The following **required** functionality is complete:
 
 The following **optional** features are implemented:
 * [X] UI animations
-* [ ] Remembering the bill amount across app restarts (if <10mins). [in progress]
+* [X] Remembering the bill amount across app restarts (if <10mins).
 * [ ] Using locale-specific currency and currency thousands separators. [in progress]
-* [ ] Making sure the keyboard is always visible and the bill amount is always the first responder. This way the user doesn't have to tap anywhere to use this app. Just launch the app and start typing. [see additional features]
+* [X] Making sure the keyboard is always visible and the bill amount is always the first responder. This way the user doesn't have to tap anywhere to use this app. Just launch the app and start typing. [see additional features]
 
 The following **additional** features are implemented:
 
