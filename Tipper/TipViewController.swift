@@ -8,8 +8,9 @@
 
 import UIKit
 
-enum ColorTheme {
-  case Light, Dark
+enum ColorTheme: String {
+  case Light = "Light"
+  case Dark = "Dark"
 }
 
 enum TipOptions: Double {

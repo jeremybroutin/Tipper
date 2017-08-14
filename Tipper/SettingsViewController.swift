@@ -20,6 +20,7 @@ class SettingsViewController: UIViewController {
   var lastSelectedTipIndexPath: IndexPath!
   var lastSelectedThemeIndexPath: IndexPath!
   var defaultTipOption: TipOptions!
+  var defaultTheme: ColorTheme = .Dark
   let manager = UserDefaultsManager.shared
 
   override func viewDidLoad() {
@@ -28,16 +29,30 @@ class SettingsViewController: UIViewController {
     navigationController?.view.backgroundColor = UIColor.black
     tableView.dataSource = self
     tableView.delegate = self
-    tableView.backgroundColor = UIColor.black
-    getDefaultTip()
+    loadUIColor()
   }
 
-  func getDefaultTip() {
-    defaultTipOption = UserDefaultsManager.shared.loadDefaultTip()
+  func getDefaults() {
+    defaultTipOption = manager.loadDefaultTip()
+    if let theme = manager.getPreferredTheme() {
+      defaultTheme = theme
+    }
+  }
+
+  func loadUIColor() {
+    getDefaults()
+    switch defaultTheme {
+    case .Light:
+      tableView.backgroundColor = UIColor.white
+    case .Dark:
+      tableView.backgroundColor = UIColor.black
+    }
+    tableView.reloadData()
   }
 }
 
 extension SettingsViewController: UITableViewDataSource {
+
   func numberOfSections(in tableView: UITableView) -> Int {
     return 2
   }
@@ -54,7 +69,13 @@ extension SettingsViewController: UITableViewDataSource {
 
   func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
     let cell = tableView.dequeueReusableCell(withIdentifier: "optionCell", for: indexPath)
-    cell.backgroundColor = UIColor.black
+    switch defaultTheme {
+    case .Light:
+      cell.backgroundColor = UIColor.white
+    case .Dark:
+      cell
+        .backgroundColor = UIColor.black
+    }
     cell.textLabel?.textColor = UIColor.darkThemeSecondColor
     cell.tintColor = UIColor.darkThemeMainColor
     cell.selectionStyle = .none
@@ -70,11 +91,10 @@ extension SettingsViewController: UITableViewDataSource {
     // Color theme options cells.
     else if indexPath.section == 1 {
       let themeOption = themeOptions[indexPath.row]
-      switch themeOption {
-      case .Dark:
-        cell.textLabel?.text = "Dark"
-      case .Light:
-        cell.textLabel?.text = "Light"
+      cell.textLabel?.text = themeOption.rawValue
+      if themeOption == defaultTheme {
+        cell.accessoryType = .checkmark
+        lastSelectedThemeIndexPath = indexPath
       }
     }
     return cell
@@ -92,22 +112,29 @@ extension SettingsViewController: UITableViewDataSource {
 }
 
 extension SettingsViewController: UITableViewDelegate {
+
   func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
     if let headerTitle = view as? UITableViewHeaderFooterView {
-      headerTitle.textLabel?.textColor = UIColor.darkThemeMainColor
+      switch defaultTheme {
+      case .Light:
+        headerTitle.textLabel?.textColor = UIColor.darkGray
+        headerTitle.tintColor = UIColor.white
+      case .Dark:
+        headerTitle.textLabel?.textColor = UIColor.darkThemeMainColor
+        headerTitle.tintColor = UIColor.clear
+      }
     }
   }
 
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    guard let currentCell = tableView.cellForRow(at: indexPath) else { return }
     if indexPath.section == 0 {
       if lastSelectedTipIndexPath != nil {
         let lastCell = tableView.cellForRow(at: lastSelectedTipIndexPath)
         lastCell?.accessoryType = .none
       }
-      guard let currentCell = tableView.cellForRow(at: indexPath) else { return }
       currentCell.accessoryType = .checkmark
       lastSelectedTipIndexPath = indexPath
-
       // Save as default tip.
       if let cellText = currentCell.textLabel?.text {
         let truncatedText = cellText.substring(to: cellText.index(before: cellText.endIndex))
@@ -120,14 +147,23 @@ extension SettingsViewController: UITableViewDelegate {
         manager.saveDefaultTip(tipOption)
         delegate.updateDefaultTip(withOption: tipOption)
       }
-
-    } else if indexPath.section == 1 {
+    }
+    else if indexPath.section == 1 {
       if lastSelectedThemeIndexPath != nil {
         let lastCell = tableView.cellForRow(at: lastSelectedThemeIndexPath)
         lastCell?.accessoryType = .none
       }
       tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
       lastSelectedThemeIndexPath = indexPath
+      // Save as default theme.
+      if let cellText = currentCell.textLabel?.text {
+        switch cellText {
+        case ColorTheme.Light.rawValue: manager.savePreferredTheme(theme: .Light)
+        case ColorTheme.Dark.rawValue: manager.savePreferredTheme(theme: .Dark)
+        default: break
+        }
+      }
+      loadUIColor()
     }
   }
 

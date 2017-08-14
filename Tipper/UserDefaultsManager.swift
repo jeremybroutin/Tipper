@@ -16,6 +16,7 @@ class UserDefaultsManager: NSObject {
   private let userDefaults = UserDefaults.standard
   private let defaultTipKey = "tipperDefaultTip"
   private let timeInBackgroundKey = "timeInBackground"
+  private let defaultThemeKey = "defaultThemeKey"
 
   func saveDefaultTip(_ value: TipOptions) {
     userDefaults.set(value.rawValue, forKey: defaultTipKey)
@@ -49,6 +50,21 @@ class UserDefaultsManager: NSObject {
   func getBackgroundDate() -> Date? {
     if let date = userDefaults.object(forKey: timeInBackgroundKey) as? Date {
       return date
+    }
+    return nil
+  }
+
+  func savePreferredTheme(theme: ColorTheme) {
+    userDefaults.set(theme.rawValue, forKey: defaultThemeKey)
+  }
+
+  func getPreferredTheme() -> ColorTheme? {
+    if let theme = userDefaults.string(forKey: defaultThemeKey) {
+      switch theme {
+      case ColorTheme.Light.rawValue: return .Light
+      case ColorTheme.Dark.rawValue: return .Dark
+      default: return nil
+      }
     }
     return nil
   }
