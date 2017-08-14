@@ -4,7 +4,7 @@
 
 Submitted by: **Jeremy Broutin**
 
-Time spent: **6** hours spent in total
+Time spent: **7.5** hours spent in total
 
 ## User Stories
 
@@ -23,14 +23,14 @@ The following **additional** features are implemented:
 
 * [X] Update constraints when keyboard is displayed to prevent hiding UI elements.
 * [X] Add custom Done button to Decimal keyboard.
-* [ ] Offer 2 color theme choices in settings. [in progress]
+* [X] Offer 2 color theme choices in settings.
 * [X] Enforce textfield formatting (eg: 130.69 is valid, 125.5.2 is not)
 
 ## Video Walkthrough 
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://im2.ezgif.com/tmp/ezgif-2-9c50fd6d29.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='https://im4.ezgif.com/tmp/ezgif-4-df34f94894.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [Ezgif](https://im2.ezgif.com).
 

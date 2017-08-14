@@ -243,14 +243,22 @@ extension TipViewController: UITextFieldDelegate {
 // MARK: - Protocol for custom delegation.
 
 protocol Updatable {
-  func updateDefaultTip(withOption option: TipOptions)
+  func updateDefaults()
 }
 
 extension TipViewController: Updatable {
 
-  func updateDefaultTip(withOption option: TipOptions) {
-    tipSegmentedControl.selectedSegmentIndex = manager.matchTipOptionToIndex(option)
-    defaultTipOption = option
+  func updateDefaults() {
+    if let defaultTip = manager.loadDefaultTip() {
+      tipSegmentedControl.selectedSegmentIndex = manager.matchTipOptionToIndex(defaultTip)
+      calculateTipAndTotal(fromAmount: amountTextField.text!, completion: nil)
+    }
+    if let defaultTheme = manager.getPreferredTheme() {
+      switch defaultTheme {
+      case .Light: view.backgroundColor = UIColor.white
+      case .Dark: view.backgroundColor = UIColor.black
+      }
+    }
   }
 
 }

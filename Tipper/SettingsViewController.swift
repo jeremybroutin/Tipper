@@ -145,7 +145,6 @@ extension SettingsViewController: UITableViewDelegate {
           return
         }
         manager.saveDefaultTip(tipOption)
-        delegate.updateDefaultTip(withOption: tipOption)
       }
     }
     else if indexPath.section == 1 {
@@ -165,6 +164,8 @@ extension SettingsViewController: UITableViewDelegate {
       }
       loadUIColor()
     }
+    // Propagate changes to TipViewController.
+    delegate.updateDefaults()
   }
 
 }
