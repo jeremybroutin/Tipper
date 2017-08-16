@@ -34,15 +34,19 @@ class TipViewController: UIViewController {
   @IBOutlet weak var totalStaticLabel: UILabel!
   @IBOutlet weak var totalResultLabel: UILabel!
 
+
+  // Constants.
   let defaultAmountPlaceHolderText = "Enter bill amount..."
   let tipOptions: [Double] = [TipOptions.Low.rawValue, TipOptions.Middle.rawValue, TipOptions.High.rawValue]
-  var selectedTip: Double!
   let maxAmountCharactersLength = 7
   let defaultCurrencyCharacter = "$"
-  var defaultTipOption: TipOptions!
   let manager = UserDefaultsManager.shared
   let settingsSegueIdentifier = "GoToSettings"
 
+  // Variables.
+  var defaultTipOption: TipOptions!
+  var selectedTip: Double!
+  var formatter: NumberFormatter!
 
   // MARK: - View life cycle
 
@@ -57,6 +61,10 @@ class TipViewController: UIViewController {
     // Subscribe to keyboard display notifications.
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
     NotificationCenter.default.addObserver(self, selector: #selector(TipViewController.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+    // Initialize formatter once.
+    formatter = NumberFormatter()
+    formatter.numberStyle = .currency
+
   }
 
   // MARK: - UI Setup helper methods
@@ -171,7 +179,15 @@ class TipViewController: UIViewController {
       tipResultLabel.text = "\(defaultCurrencyCharacter)0.00"
       totalResultLabel.text = "\(defaultCurrencyCharacter)0.00"
     } else {
-      calculateTipAndTotal(fromAmount: sender.text!, completion:  nil)
+
+      // Reformat the user entry.
+      if let amountString = sender.text?.currencyInputFormatting() {
+        sender.text = amountString
+        // Start calculating tip.
+        let amountNumber = formatter.number(from: sender.text!)
+        calculateTipAndTotal(fromAmount: String(describing: amountNumber!), completion:  nil)
+      }
+
     }
   }
 
@@ -224,20 +240,6 @@ extension TipViewController: UITextFieldDelegate {
       shouldDisplayTipResultLabels(false)
     }
   }
-
-  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    guard let text = textField.text else { return true }
-    // Do not allow multiple dots.
-    if string == "." {
-      for c in text.characters {
-        if c == "." { return false }
-      }
-      return true
-    }
-    // Limit max characters
-    let length = text.characters.count + string.utf16.count - range.length
-    return length <= maxAmountCharactersLength
-  }
 }
 
 // MARK: - Protocol for custom delegation.
@@ -260,6 +262,38 @@ extension TipViewController: Updatable {
       }
     }
   }
+}
 
+extension String {
+
+  // Formatting text for currency textField.
+  func currencyInputFormatting() -> String {
+
+    var number: NSNumber!
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .currencyAccounting
+    formatter.currencySymbol = "$"
+    formatter.maximumFractionDigits = 2
+    formatter.minimumFractionDigits = 2
+
+    var amountWithPrefix = self
+
+    // Remove from String: "$", ".", ","
+    let regex = try! NSRegularExpression(pattern: "[^0-9]", options: .caseInsensitive)
+    amountWithPrefix = regex.stringByReplacingMatches(in: amountWithPrefix,
+                                                      options: NSRegularExpression.MatchingOptions(rawValue: 0),
+                                                      range: NSMakeRange(0, self.characters.count),
+                                                      withTemplate: "")
+
+    let double = (amountWithPrefix as NSString).doubleValue
+    number = NSNumber(value: (double / 100))
+
+    // If first number is 0 or all numbers were deleted.
+    guard number != 0 as NSNumber else {
+      return ""
+    }
+
+    return formatter.string(from: number)!
+  }
 }
 
