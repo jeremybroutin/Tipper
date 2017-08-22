@@ -55,7 +55,7 @@ Because the reference to self in the closure is now weak, the closure does not r
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright 2017 Jeremy Broutin
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
