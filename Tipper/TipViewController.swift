@@ -38,7 +38,7 @@ class TipViewController: UIViewController {
   // Constants.
   let defaultAmountPlaceHolderText = "Enter bill amount..."
   let tipOptions: [Double] = [TipOptions.Low.rawValue, TipOptions.Middle.rawValue, TipOptions.High.rawValue]
-  let maxAmountCharactersLength = 7
+  let maxAmountCharactersLength = 8
   let defaultCurrencyCharacter = "$"
   let manager = UserDefaultsManager.shared
   let settingsSegueIdentifier = "GoToSettings"
@@ -130,6 +130,9 @@ class TipViewController: UIViewController {
   }
 
   func shouldDisplayTipResultLabels(_ value:Bool) {
+    if !value {
+      amountTextField.text = ""
+    }
     tipStaticLabel.isHidden = !value
     tipResultLabel.isHidden = !value
     totalStaticLabel.isHidden = !value
@@ -171,24 +174,19 @@ class TipViewController: UIViewController {
 
   @IBAction func tappedTipOptions(_ sender: UISegmentedControl) {
     selectedTip = tipOptions[sender.selectedSegmentIndex]
-    calculateTipAndTotal(fromAmount: amountTextField.text!, completion: nil)
+    let amountNumber: NSNumber = formatter.number(from: amountTextField.text!) ?? 0.0
+    let amountStringForTipCalculation = String(describing: amountNumber)
+    calculateTipAndTotal(fromAmount: amountStringForTipCalculation, completion: nil)
   }
 
   @IBAction func textFieldEditingDidChange(_ sender: UITextField) {
-    if sender.text!.isEmpty {
-      tipResultLabel.text = "\(defaultCurrencyCharacter)0.00"
-      totalResultLabel.text = "\(defaultCurrencyCharacter)0.00"
-    } else {
+    guard let text = sender.text else { return }
+    let formattedText = text.currencyInputFormatting()
+    let amountNumber: NSNumber = formatter.number(from: formattedText) ?? 0.0
+    let amountStringForTipCalculation = String(describing: amountNumber)
 
-      // Reformat the user entry.
-      if let amountString = sender.text?.currencyInputFormatting() {
-        sender.text = amountString
-        // Start calculating tip.
-        let amountNumber = formatter.number(from: sender.text!)
-        calculateTipAndTotal(fromAmount: String(describing: amountNumber!), completion:  nil)
-      }
-
-    }
+    sender.text = formattedText
+    calculateTipAndTotal(fromAmount: amountStringForTipCalculation, completion: nil)
   }
 
   func goToSettings() {
@@ -236,9 +234,18 @@ extension TipViewController: UITextFieldDelegate {
   }
 
   func textFieldDidEndEditing(_ textField: UITextField) {
-    if textField.text!.isEmpty {
+    if textField.text!.isEmpty || textField.text! == "$0.00" {
       shouldDisplayTipResultLabels(false)
     }
+  }
+
+  func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    let currentCharacterCount = textField.text?.characters.count ?? 0
+    if (range.length + range.location > currentCharacterCount){
+      return false
+    }
+    let newLength = currentCharacterCount + string.characters.count - range.length
+    return newLength <= maxAmountCharactersLength
   }
 }
 
@@ -290,7 +297,7 @@ extension String {
 
     // If first number is 0 or all numbers were deleted.
     guard number != 0 as NSNumber else {
-      return ""
+      return "\(formatter.currencySymbol!)0.00"
     }
 
     return formatter.string(from: number)!

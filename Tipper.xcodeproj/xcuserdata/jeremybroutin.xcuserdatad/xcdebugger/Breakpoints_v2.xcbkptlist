@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Tipper/TipViewController.swift"
-            timestampString = "524602970.954766"
+            timestampString = "525064984.723767"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "188"
-            endingLineNumber = "188"
+            startingLineNumber = "182"
+            endingLineNumber = "182"
             landmarkName = "textFieldEditingDidChange(_:)"
             landmarkType = "7">
          </BreakpointContent>
