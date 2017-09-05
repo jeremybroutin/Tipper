@@ -16,7 +16,7 @@ The following **required** functionality is complete:
 The following **optional** features are implemented:
 * [X] UI animations
 * [X] Remembering the bill amount across app restarts (if <10mins).
-* [ ] Using locale-specific currency and currency thousands separators. [in progress]
+* [X] Using locale-specific currency and currency thousands separators.
 * [X] Making sure the keyboard is always visible and the bill amount is always the first responder. This way the user doesn't have to tap anywhere to use this app. Just launch the app and start typing. [see additional features]
 
 The following **additional** features are implemented:
@@ -55,7 +55,7 @@ Because the reference to self in the closure is now weak, the closure does not r
 
 ## License
 
-    Copyright [yyyy] [name of copyright owner]
+    Copyright 2017 Jeremy Broutin
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
